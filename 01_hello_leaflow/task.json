@@ -8,7 +8,7 @@
           { "var": "services" },
           { "and": [
               { "in": [ "hello-leaflow", { "var": "workload_name" } ] },
-              { "some": [ { "var": "ports" }, { "==": [ { "var": "port" }, 80 ] } ] }
+              { "some": [ { "var": "ports" }, { "==": [ { "var": "target_port" }, 80 ] } ] }
           ] }
       ]},
       { "some": [
