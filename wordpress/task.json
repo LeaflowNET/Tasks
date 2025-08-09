@@ -1,7 +1,7 @@
 {
   "name": "部署 WordPress",
   "description": "在当前工作空间中部署一个名为 wordpress 的应用（Deployment），并确保 MySQL 数据库（StatefulSet）运行中。",
-  "amount": 100,
+  "amount": 10,
   "rules": {
     "and": [
       { "some": [ { "var": "storages" }, { "in": [ "wordpress", { "var": "name" } ] } ] },
