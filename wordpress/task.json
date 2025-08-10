@@ -1,50 +1,106 @@
 {
   "name": "部署 WordPress",
   "description": "在当前工作空间中部署一个名为 wordpress 的应用（Deployment），并确保 MySQL 数据库（StatefulSet）运行中。",
+  "author": {
+    "name": "Leaflow",
+    "url": "https://leaflow.net",
+    "email": "nan@lifergroup.com"
+  },
   "amount": 10,
   "rules": {
     "and": [
-      { "some": [ { "var": "storages" }, { "in": [ "wordpress", { "var": "name" } ] } ] },
-      { "some": [ { "var": "storages" }, { "in": [ "mysql", { "var": "name" } ] } ] },
-
-      { "some": [
-          { "var": "services" },
-          { "and": [
-              { "in": [ "wordpress", { "var": "workload_name" } ] },
-              { "some": [ { "var": "ports" }, { "==": [ { "var": "port" }, 80 ] } ] }
-          ] }
-      ] },
-      { "some": [ { "var": "services" }, { "in": [ "mysql", { "var": "workload_name" } ] } ] },
-
-      { "some": [
-          { "var": "ingresses" },
-          { "some": [
-              { "var": "rules" },
-              { "some": [
-                  { "var": "http.paths" },
-                  { "in": [ "wordpress", { "var": "backend.service.name" } ] }
-              ]}
-          ]}
-      ]},
-
-      { "some": [
-          { "var": "statefulsets" },
-          { "and": [
-              { "in": [ "mysql", { "var": "name" } ] },
-              { "==": [ { "var": "status" }, "Running" ] }
-          ] }
-      ]},
-
-      { "some": [
-          { "var": "deployments" },
-          { "and": [
-              { "in": [ "wordpress", { "var": "name" } ] },
-              { "==": [ { "var": "status" }, "Available" ] },
-              { "some": [ { "var": "ports" }, { "==": [ { "var": "port" }, 80 ] } ] },
-              { "some": [ { "var": "volumes" }, true ] },
-              { "some": [ { "var": "containers" }, { "in": [ "wordpress", { "var": "image" } ] } ] }
-          ] }
-      ]}
+      {
+        "some": [
+          {
+            "var": "statefulsets"
+          },
+          {
+            "and": [
+              {
+                "in": [
+                  "mysql",
+                  {
+                    "var": "name"
+                  }
+                ]
+              },
+              {
+                "==": [
+                  {
+                    "var": "status"
+                  },
+                  "Running"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "some": [
+          {
+            "var": "deployments"
+          },
+          {
+            "and": [
+              {
+                "in": [
+                  "wordpress",
+                  {
+                    "var": "name"
+                  }
+                ]
+              },
+              {
+                "==": [
+                  {
+                    "var": "status"
+                  },
+                  "Available"
+                ]
+              },
+              {
+                "some": [
+                  {
+                    "var": "ports"
+                  },
+                  {
+                    "==": [
+                      {
+                        "var": "port"
+                      },
+                      80
+                    ]
+                  }
+                ]
+              },
+              {
+                "some": [
+                  {
+                    "var": "volumes"
+                  },
+                  true
+                ]
+              },
+              {
+                "some": [
+                  {
+                    "var": "containers"
+                  },
+                  {
+                    "in": [
+                      "wordpress",
+                      {
+                        "var": "image"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     ]
   }
 }

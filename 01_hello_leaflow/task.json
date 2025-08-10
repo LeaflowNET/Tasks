@@ -1,6 +1,9 @@
 {
   "name": "01 Hello Leaflow!",
   "description": "欢迎使用 Leaflow 平台！",
+  "author": {
+    "name": "cxykevin"
+  },
   "amount": 5,
   "rules": {
     "and": [
