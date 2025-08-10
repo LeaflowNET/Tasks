@@ -1,0 +1,79 @@
+{
+  "name": "NextChat! 部署一个自己的 AI 对话网页",
+  "description": "NextChat 是一个轻量快速的多平台 AI 助理。",
+  "author": {
+    "name": "iVampireSP",
+    "email": "im@ivampiresp.com",
+    "url": "https://ivampiresp.com"
+  },
+  "amount": 10,
+  "rules": {
+    "and": [
+      { "some": [
+        { "var": "configmaps" },
+        { "and": [
+          { "==": [ { "var": "name" }, "nextchat-config" ] },
+          { "in": ["BASE_URL", { "var": "data_keys" }] },
+          { "==": [ { "var": "data.BASE_URL" }, "http://llm.ai-infra.svc.cluster.local" ] }
+        ]}
+      ]},
+      { "some": [
+        { "var": "secrets" },
+        { "and": [
+          { "==": [ { "var": "name" }, "nextchat" ] },
+          { "in": [ "OPENAI_API_KEY", { "var": "data_keys" } ] },
+          { "in": [ "CODE", { "var": "data_keys" } ] }
+        ]}
+      ]},
+      { "some": [
+        { "var": "deployments" },
+        { "and": [
+          { "==": [ { "var": "name" }, "nextchat" ] },
+          { "==": [ { "var": "status" }, "Available" ] },
+          { "some": [
+            { "var": "containers" },
+            { "and": [
+              { "==": [ { "var": "image" }, "yidadaa/chatgpt-next-web:latest" ] },
+              { "some": [
+                { "var": "ports" },
+                { "==": [ { "var": "container_port" }, 3000 ] }
+              ]},
+              { "some": [
+                { "var": "env_from_configmap" },
+                { "==": [ { "var": "configmap_name" }, "nextchat-config" ] }
+              ]},
+              { "some": [
+                { "var": "env_from_secret" },
+                { "==": [ { "var": "secret_name" }, "nextchat" ] }
+              ]}
+            ]}
+          ]}
+        ]}
+      ]},
+      { "some": [
+        { "var": "services" },
+        { "and": [
+          { "==": [ { "var": "name" }, "nextchat" ] },
+          { "==": [ { "var": "service_type" }, "ClusterIP" ] },
+          { "some": [
+            { "var": "ports" },
+            { "==": [ { "var": "target_port" }, 3000 ] }
+          ]}
+        ]}
+      ]},
+      { "some": [
+        { "var": "ingresses" },
+        { "and": [
+          { "==": [ { "var": "status" }, "Ready" ] },
+          { "some": [
+            { "var": "rules" },
+            { "some": [
+              { "var": "http.paths" },
+              { "==": [ { "var": "backend.service.name" }, "nextchat" ] }
+            ]}
+          ]}
+        ]}
+      ]}
+    ]
+  }
+}
