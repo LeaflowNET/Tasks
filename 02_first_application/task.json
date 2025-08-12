@@ -18,7 +18,7 @@
           { "var": "deployments" },
           { "and": [
               { "in": [ "first-app", { "var": "name" } ] },
-              { "==": [ { "var": "status" }, "Available" ] },
+              { "==": [ { "var": "status" }, "Running" ] },
               { "some": [ { "var": "ports" }, { "==": [ { "var": "port" }, 80 ] } ] },
               { "some": [ { "var": "containers" }, { "in": [ "hello-leaflow", { "var": "image" } ] } ] }
           ] }

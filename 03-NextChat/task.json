@@ -29,7 +29,7 @@
         { "var": "deployments" },
         { "and": [
           { "==": [ { "var": "name" }, "nextchat" ] },
-          { "==": [ { "var": "status" }, "Available" ] },
+          { "==": [ { "var": "status" }, "Running" ] },
           { "some": [
             { "var": "containers" },
             { "and": [
