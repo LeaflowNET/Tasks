@@ -44,9 +44,8 @@
           { "var": "configmaps" },
           {
             "and": [
-              { "==": [{ "var": "name" }, "redis-config"] },
-              { "in": ["redis.conf", { "var": "data_keys" }] },
-              { "in": ["requirepass", { "var": "data.redis.conf" }] }
+              { "==": [{ "var": "name" }, "php-config"] },
+              { "in": ["php.ini", { "var": "data_keys" }] }
             ]
           }
         ]
@@ -56,14 +55,8 @@
           { "var": "configmaps" },
           {
             "and": [
-              { "==": [{ "var": "name" }, "php-config"] },
-              { "in": ["php.ini", { "var": "data_keys" }] },
-              {
-                "in": [
-                  "session.save_handler = redis",
-                  { "var": "data.php.ini" }
-                ]
-              }
+              { "==": [{ "var": "name" }, "redis-config"] },
+              { "in": ["redis.conf", { "var": "data_keys" }] }
             ]
           }
         ]
