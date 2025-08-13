@@ -1,0 +1,207 @@
+{
+  "name": "部署一个高可用，多副本的 WordPress",
+  "description": "从这里开始，可就不是开胃菜了。通过本任务你将会获得一个高可用的 WordPress。",
+  "author": {
+    "name": "iVampireSP",
+    "email": "im@ivampiresp.com",
+    "url": "https://ivampiresp.com"
+  },
+  "amount": 10,
+  "rules": {
+    "and": [
+      {
+        "some": [
+          { "var": "storages" },
+          {
+            "and": [
+              {
+                "in": [
+                  { "var": "name" },
+                  ["mysql-data", "redis-data", "wordpress-data"]
+                ]
+              },
+              { "==": [{ "var": "capacity" }, "512Mi"] },
+              { "==": [{ "var": "is_bound" }, true] }
+            ]
+          }
+        ]
+      },
+
+      {
+        "some": [
+          { "var": "configmaps" },
+          {
+            "and": [
+              { "==": [{ "var": "name" }, "mysql-config"] },
+              { "==": [{ "var": "data.MYSQL_DATABASE" }, "wordpress"] },
+              { "==": [{ "var": "data.MYSQL_USER" }, "wordpress"] }
+            ]
+          }
+        ]
+      },
+      {
+        "some": [
+          { "var": "configmaps" },
+          {
+            "and": [
+              { "==": [{ "var": "name" }, "redis-config"] },
+              { "in": ["redis.conf", { "var": "data_keys" }] },
+              { "in": ["requirepass", { "var": "data.redis.conf" }] }
+            ]
+          }
+        ]
+      },
+      {
+        "some": [
+          { "var": "configmaps" },
+          {
+            "and": [
+              { "==": [{ "var": "name" }, "php-config"] },
+              { "in": ["php.ini", { "var": "data_keys" }] },
+              {
+                "in": [
+                  "session.save_handler = redis",
+                  { "var": "data.php.ini" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "some": [
+          { "var": "configmaps" },
+          {
+            "and": [
+              { "==": [{ "var": "name" }, "apache2-config"] },
+              { "in": ["default.conf", { "var": "data_keys" }] }
+            ]
+          }
+        ]
+      },
+
+      {
+        "some": [
+          { "var": "secrets" },
+          {
+            "and": [
+              { "==": [{ "var": "name" }, "mysql-password"] },
+              { "in": ["MYSQL_ROOT_PASSWORD", { "var": "data_keys" }] },
+              { "in": ["MYSQL_PASSWORD", { "var": "data_keys" }] }
+            ]
+          }
+        ]
+      },
+
+      {
+        "some": [
+          { "var": "statefulsets" },
+          {
+            "and": [
+              { "==": [{ "var": "name" }, "mysql"] },
+              {
+                "some": [
+                  { "var": "containers" },
+                  {
+                    "and": [
+                      {
+                        "==": [
+                          { "var": "image" },
+                          "m.daocloud.io/docker.io/mysql:9.4.0"
+                        ]
+                      },
+                      {
+                        "some": [
+                          { "var": "env_from_configmap" },
+                          {
+                            "==": [{ "var": "configmap_name" }, "mysql-config"]
+                          }
+                        ]
+                      },
+                      {
+                        "some": [
+                          { "var": "env_from_secret" },
+                          { "==": [{ "var": "secret_name" }, "mysql-password"] }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        "some": [
+          { "var": "statefulsets" },
+          {
+            "and": [
+              { "==": [{ "var": "name" }, "redis"] },
+              {
+                "some": [
+                  { "var": "containers" },
+                  { "==": [{ "var": "image" }, "redis:8.2.0-alpine"] }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        "some": [
+          { "var": "deployments" },
+          {
+            "and": [
+              { "==": [{ "var": "name" }, "apache2"] },
+              {
+                "some": [
+                  { "var": "containers" },
+                  {
+                    "==": [
+                      { "var": "image" },
+                      "ccr.ccs.tencentyun.com/leafphp/leafphp:8.4-apache.2"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        "some": [
+          { "var": "services" },
+          {
+            "and": [
+              { "==": [{ "var": "name" }, "apache2"] },
+              { "==": [{ "var": "service_type" }, "LoadBalancer"] },
+              {
+                "some": [
+                  { "var": "ports" },
+                  { "==": [{ "var": "target_port" }, 80] }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        "some": [
+          { "var": "horizontalpodautoscalers" },
+          {
+            "and": [
+              { "==": [{ "var": "name" }, "apache2-hpa"] },
+              { "<=": [{ "var": "min_replicas" }, 1] },
+              { ">=": [{ "var": "max_replicas" }, 3] }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
