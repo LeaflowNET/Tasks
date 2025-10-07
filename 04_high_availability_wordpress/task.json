@@ -98,12 +98,6 @@
                   {
                     "and": [
                       {
-                        "==": [
-                          { "var": "image" },
-                          "m.daocloud.io/docker.io/mysql:9.4.0"
-                        ]
-                      },
-                      {
                         "some": [
                           { "var": "env_from_configmap" },
                           {
